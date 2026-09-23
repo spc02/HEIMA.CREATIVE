@@ -1,68 +1,43 @@
-# Panduan Kolaborasi Tim & Deploy Vercel (Heima Creative)
+# Panduan Praktis Tim HEIMA.CREATIVE
 
-File script `collab_heima.bat` telah dibuat khusus untuk mempermudah Anda dan teman Anda bekerja sama dalam satu proyek GitHub serta meng-upload langsung ke Vercel tanpa perlu menghafal perintah terminal.
+File script **`collab_heima.bat`** ini dibuat sangat sederhana, hanya memiliki 3 tombol utama:
 
----
+```text
+=====================================================
+             HEIMA CREATIVE - TIM PROJECT
+=====================================================
 
-## 📌 BAGIAN 1: Untuk Anda (Pemilik Proyek / Owner) - Pertama Kali
+  [1] Gabung / Ambil Update Terbaru dari GitHub
+  [2] Simpan dan Kirim Update ke GitHub
+  [3] Upload / Deploy Website ke Vercel
+  [0] Keluar
 
-Karena repo GitHub belum dibuat, ikuti 3 langkah mudah ini:
-
-### 1. Buat Repositori Baru di GitHub
-1. Buka [https://github.com/new](https://github.com/new).
-2. Isi **Repository name**: `heima-creative` (atau nama lain yang Anda sukai).
-3. Pilih **Public** atau **Private**.
-4. ⚠️ **JANGAN centang** *"Add a README file"*, *"Add .gitignore"*, atau *"Choose a license"* (biarkan kosong).
-5. Klik tombol hijau **Create repository**.
-6. Salin link HTTPS repo Anda (contoh: `https://github.com/USERNAME/heima-creative.git`).
-
-### 2. Hubungkan Proyek ke GitHub
-1. Di folder proyek ini, klik ganda file **`collab_heima.bat`**.
-2. Pilih menu **[5] Hubungkan Repo GitHub Proyek Ini**.
-3. Tempel (Paste) URL repo GitHub Anda tadi, lalu tekan Enter.
-4. Script akan otomatis meng-upload kode awal ke GitHub!
-
-### 3. Undang Teman Anda sebagai Collaborator (PENTING!)
-Agar teman Anda diizinkan untuk mengirim perubahan (Push) ke repo Anda:
-1. Buka repo Anda di browser GitHub.
-2. Masuk ke tab **Settings** > menu kiri pilih **Collaborators**.
-3. Klik tombol hijau **Add people**.
-4. Masukkan username atau email GitHub teman Anda, lalu klik **Add to this repository**.
-5. Teman Anda akan menerima email undangan / notifikasi di GitHub dan harus klik **Accept Invitation**.
+=====================================================
+```
 
 ---
 
-## 📌 BAGIAN 2: Untuk Teman Anda (Rekan Tim)
-
-Ada 2 cara teman Anda mendapatkan proyek ini:
-
-### Cara A (Paling Mudah): Anda kirim file `collab_heima.bat` ke teman Anda
-1. Kirimkan file `collab_heima.bat` ke teman Anda (lewat WA, Telegram, email, dll).
-2. Teman Anda membuat satu folder kosong di komputernya, lalu menaruh file `collab_heima.bat` di sana dan menjalankannya (klik ganda).
-3. Teman Anda memilih menu:
-   - **[1] Setup Identitas Akun GitHub Teman**: Masukkan Nama dan Email GitHub miliknya.
-   - **[6] Download / Clone Proyek**: Masukkan URL repo GitHub proyek Anda. Proyek akan otomatis ter-download lengkap!
-
-### Cara B: Jika Anda mengirimkan seluruh folder proyek
-1. Teman Anda cukup membuka folder proyek.
-2. Klik ganda **`collab_heima.bat`**.
-3. Pilih menu **[1] Setup Identitas Akun GitHub Teman**.
+## 👥 Cara Teman Anda Memakai (Pertama Kali):
+1. Kirim file **`collab_heima.bat`** ini ke teman Anda.
+2. Teman Anda cukup klik ganda **`collab_heima.bat`** lalu pilih nomor **`[1]`**.
+3. Jika baru pertama kali, script akan meminta teman Anda memasukkan Nama & Email GitHub miliknya (otomatis sekali saja).
+4. Proyek akan otomatis ter-download lengkap ke komputernya!
 
 ---
 
-## 🚀 Alur Kerja Sehari-Hari (Untuk Teman & Anda)
+## 🚀 Alur Kerja Sehari-Hari:
 
-Setiap kali hendak bekerja atau setelah selesai mengedit:
+1. **Sebelum mulai kerja:**  
+   Pilih nomor **`[1]`** untuk mengambil kode terbaru dari tim.
+   
+2. **Setelah selesai edit website:**  
+   Pilih nomor **`[2]`** untuk langsung menyimpan dan mengirim update ke GitHub.
 
-1. **Sebelum mulai mengedit:**
-   - Jalankan `collab_heima.bat` -> Pilih menu **[2] Ambil Update Terbaru (Git Pull)** agar kode selalu yang paling baru.
+3. **Mempublikasikan website live ke internet:**  
+   Pilih nomor **`[3]`** untuk langsung upload ke Vercel!
 
-2. **Setelah selesai mengedit file (HTML, CSS, gambar, dll):**
-   - Jalankan `collab_heima.bat` -> Pilih menu **[3] Simpan & Kirim Perubahan (Git Push)**.
-   - Masukkan catatan singkat perubahan yang dilakukan (contoh: "Update bagian portfolio").
-   - Perubahan akan otomatis terkirim ke GitHub!
+---
 
-3. **Deploy / Upload ke Vercel:**
-   - Jalankan `collab_heima.bat` -> Pilih menu **[4] Upload / Deploy Website ke Vercel**.
-   - Pilih **[1] Deploy Production** untuk langsung live ke internet!
-   - *(Jika teman Anda belum login Vercel di laptopnya, pilih menu [3] Login Akun Vercel terlebih dahulu).*
+> ⚠️ **Catatan untuk Pemilik Proyek:**  
+> Pastikan teman Anda sudah diundang di GitHub:  
+> Buka: https://github.com/spc02/HEIMA.CREATIVE/settings/access -> Klik **Add people** -> Masukkan akun GitHub teman Anda.
