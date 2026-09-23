@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 setlocal enabledelayedexpansion
-title HEIMA CREATIVE - Git & Vercel Collaboration Tool
+title HEIMA CREATIVE - Git dan Vercel Collaboration Tool
 
 :: URL default repositori proyek
 set "DEFAULT_REPO_URL=https://github.com/spc02/HEIMA.CREATIVE.git"
@@ -10,7 +10,7 @@ set "REPO_CONFIG_FILE=%~dp0repo_info.txt"
 :MAIN_MENU
 cls
 echo =====================================================================
-echo          HEIMA CREATIVE - PUSAT KOLABORASI & DEPLOYMENT
+echo          HEIMA CREATIVE - PUSAT KOLABORASI DAN DEPLOYMENT
 echo =====================================================================
 echo.
 
@@ -36,13 +36,13 @@ if not "!SAVED_REPO!"=="" (
 echo.
 echo Silakan pilih menu di bawah ini:
 echo ---------------------------------------------------------------------
-echo  [1] Setup Identitas Akun GitHub Teman (Nama & Email)
+echo  [1] Setup Identitas Akun GitHub Teman (Nama dan Email)
 echo  [2] Ambil Update Terbaru dari GitHub (Git Pull)
-echo  [3] Simpan & Kirim Perubahan ke GitHub (Git Add, Commit & Push)
+echo  [3] Simpan dan Kirim Perubahan ke GitHub (Git Add, Commit, Push)
 echo  [4] Upload / Deploy Website ke Vercel
 echo  [5] Hubungkan Repo GitHub Proyek Ini (Pertama Kali oleh Pemilik)
 echo  [6] Download / Clone Proyek Ini ke Folder Baru (Untuk Teman Baru)
-echo  [7] Cek Status Proyek (Git & Vercel)
+echo  [7] Cek Status Proyek (Git dan Vercel)
 echo  [0] Keluar
 echo ---------------------------------------------------------------------
 set /p MENU_CHOICE="Pilih nomor [0-7] lalu tekan ENTER: "
@@ -57,7 +57,7 @@ if "%MENU_CHOICE%"=="7" goto CHECK_STATUS
 if "%MENU_CHOICE%"=="0" goto EXIT_SCRIPT
 
 echo Pilihan tidak valid. Silakan pilih 0 sampai 7.
-timeout /t 2 >nul
+ping 127.0.0.1 -n 3 >nul
 goto MAIN_MENU
 
 
@@ -145,12 +145,12 @@ goto MAIN_MENU
 
 
 :: =====================================================================
-:: MENU 3: GIT PUSH (SIMPAN & KIRIM PERUBAHAN)
+:: MENU 3: GIT PUSH (SIMPAN DAN KIRIM PERUBAHAN)
 :: =====================================================================
 :GIT_PUSH
 cls
 echo =====================================================================
-echo             SIMPAN & KIRIM PERUBAHAN KE GITHUB (PUSH)
+echo             SIMPAN DAN KIRIM PERUBAHAN KE GITHUB (PUSH)
 echo =====================================================================
 echo.
 
@@ -192,7 +192,7 @@ if %errorlevel% equ 0 (
     echo [PERHATIAN] Gagal push ke GitHub!
     echo Kemungkinan penyebab:
     echo 1. Anda belum diundang sebagai 'Collaborator' di repo pemilik.
-    echo    (Minta pemilik repo invite username GitHub Anda di Settings > Collaborators).
+    echo    (Minta pemilik repo invite username GitHub Anda di Settings ^> Collaborators).
     echo 2. Ada perubahan baru dari teman lain di GitHub (Coba jalankan menu 2: Pull dulu).
 )
 
@@ -294,7 +294,7 @@ if %errorlevel% equ 0 (
     echo.
     echo [SUKSES!] Repositori berhasil terhubung dan kode terkirim ke GitHub!
     echo Sekarang Anda bisa mengundang teman Anda di GitHub:
-    echo Masuk ke Repo > Settings > Collaborators > Add people (masukkan username teman Anda).
+    echo Masuk ke Repo ^> Settings ^> Collaborators ^> Add people (masukkan username teman Anda).
 ) else (
     echo.
     echo [PERINGATAN] Gagal push awal ke GitHub. Pastikan URL benar dan Anda sudah login.
@@ -368,12 +368,12 @@ goto MAIN_MENU
 :CHECK_STATUS
 cls
 echo =====================================================================
-echo                      STATUS GIT & VERCEL
+echo                      STATUS GIT DAN VERCEL
 echo =====================================================================
 echo.
 echo --- KONFIGURASI GIT ---
-git config user.name 2>nul && echo Nama Git  : !CURRENT_NAME!
-git config user.email 2>nul && echo Email Git : !CURRENT_EMAIL!
+git config user.name 2>nul
+git config user.email 2>nul
 echo.
 echo --- REMOTE GITHUB ---
 git remote -v
