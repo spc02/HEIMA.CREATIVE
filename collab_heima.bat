@@ -3,7 +3,8 @@ chcp 65001 >nul
 setlocal enabledelayedexpansion
 title HEIMA CREATIVE - Git & Vercel Collaboration Tool
 
-:: Lokasi file konfigurasi repo
+:: URL default repositori proyek
+set "DEFAULT_REPO_URL=https://github.com/spc02/HEIMA.CREATIVE.git"
 set "REPO_CONFIG_FILE=%~dp0repo_info.txt"
 
 :MAIN_MENU
@@ -21,9 +22,12 @@ if %errorlevel% neq 0 (
     echo.
 )
 
-:: Cek apakah sudah ada info repo tersimpan
+:: Cek apakah sudah ada info repo tersimpan atau gunakan default
+set "SAVED_REPO=%DEFAULT_REPO_URL%"
 if exist "%REPO_CONFIG_FILE%" (
     set /p SAVED_REPO=<"%REPO_CONFIG_FILE%"
+)
+if not "!SAVED_REPO!"=="" (
     echo [Status Repo] Terhubung ke: !SAVED_REPO!
 ) else (
     echo [Status Repo] Belum ada URL GitHub tersimpan.
@@ -311,7 +315,7 @@ echo               DOWNLOAD / CLONE PROYEK KE KOMPUTER TEMAN
 echo =====================================================================
 echo.
 
-set "TARGET_REPO="
+set "TARGET_REPO=%DEFAULT_REPO_URL%"
 if exist "%REPO_CONFIG_FILE%" (
     set /p TARGET_REPO=<"%REPO_CONFIG_FILE%"
 )
