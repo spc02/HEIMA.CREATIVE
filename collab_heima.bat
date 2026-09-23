@@ -36,13 +36,13 @@ if not "!SAVED_REPO!"=="" (
 echo.
 echo Silakan pilih menu di bawah ini:
 echo ---------------------------------------------------------------------
-echo  [1] Setup Identitas Akun GitHub Teman (Nama dan Email)
-echo  [2] Ambil Update Terbaru dari GitHub (Git Pull)
-echo  [3] Simpan dan Kirim Perubahan ke GitHub (Git Add, Commit, Push)
+echo  [1] Setup Identitas Akun GitHub Teman - Nama dan Email
+echo  [2] Ambil Update Terbaru dari GitHub - Git Pull
+echo  [3] Simpan dan Kirim Perubahan ke GitHub - Git Push
 echo  [4] Upload / Deploy Website ke Vercel
-echo  [5] Hubungkan Repo GitHub Proyek Ini (Pertama Kali oleh Pemilik)
-echo  [6] Download / Clone Proyek Ini ke Folder Baru (Untuk Teman Baru)
-echo  [7] Cek Status Proyek (Git dan Vercel)
+echo  [5] Hubungkan Repo GitHub Proyek Ini - Khusus Pemilik
+echo  [6] Download / Clone Proyek Ini ke Folder Baru - Teman Baru
+echo  [7] Cek Status Proyek - Git dan Vercel
 echo  [0] Keluar
 echo ---------------------------------------------------------------------
 set /p MENU_CHOICE="Pilih nomor [0-7] lalu tekan ENTER: "
@@ -70,10 +70,11 @@ echo =====================================================================
 echo                SETUP IDENTITAS AKUN GITHUB TEMAN
 echo =====================================================================
 echo.
-echo Langkah ini mengatur Nama dan Email Anda untuk riwayat perubahan (commit).
+echo Langkah ini mengatur Nama dan Email Anda untuk riwayat perubahan.
 echo.
 
-:: Tampilkan konfigurasi saat ini
+set "CURRENT_NAME="
+set "CURRENT_EMAIL="
 for /f "tokens=*" %%i in ('git config --global user.name 2^>nul') do set CURRENT_NAME=%%i
 for /f "tokens=*" %%i in ('git config --global user.email 2^>nul') do set CURRENT_EMAIL=%%i
 
@@ -82,14 +83,14 @@ echo   - Nama  : !CURRENT_NAME!
 echo   - Email : !CURRENT_EMAIL!
 echo.
 
-set /p NEW_NAME="Masukkan Nama / Username GitHub Anda : "
+set /p NEW_NAME="Masukkan Nama atau Username GitHub Anda : "
 if "!NEW_NAME!"=="" (
     echo Nama tidak boleh kosong!
     pause
     goto MAIN_MENU
 )
 
-set /p NEW_EMAIL="Masukkan Email GitHub Anda            : "
+set /p NEW_EMAIL="Masukkan Email GitHub Anda               : "
 if "!NEW_EMAIL!"=="" (
     echo Email tidak boleh kosong!
     pause
@@ -104,24 +105,24 @@ echo [SUKSES] Identitas Git berhasil diatur ke:
 echo   - Nama  : !NEW_NAME!
 echo   - Email : !NEW_EMAIL!
 echo.
-echo Catatan: Saat pertama kali melakukan Push/Upload ke GitHub,
-echo Windows akan menampilkan jendela login GitHub otomatis (Git Credential Manager).
-echo Cukup klik 'Sign in with your browser' untuk login.
+echo Catatan: Saat pertama kali melakukan Push ke GitHub,
+echo Windows akan menampilkan jendela login GitHub otomatis.
+echo Cukup klik 'Sign in with your browser' untuk verifikasi akun Anda.
 echo.
 pause
 goto MAIN_MENU
 
 
 :: =====================================================================
-:: MENU 2: GIT PULL (AMBIL UPDATE TERBARU)
+:: MENU 2: GIT PULL
 :: =====================================================================
 :GIT_PULL
 cls
 echo =====================================================================
-echo               AMBIL UPDATE TERBARU DARI GITHUB (PULL)
+echo               AMBIL UPDATE TERBARU DARI GITHUB - PULL
 echo =====================================================================
 echo.
-echo Mengambil kode terbaru yang telah diupload teman / rekan Anda...
+echo Mengambil kode terbaru dari repository GitHub...
 echo.
 
 if not exist "%~dp0.git" (
@@ -134,7 +135,7 @@ if not exist "%~dp0.git" (
 git pull origin main
 if %errorlevel% neq 0 (
     echo.
-    echo [INFO] Mencoba pull dengan branch master jika main tidak ada...
+    echo [INFO] Mencoba pull dengan branch master...
     git pull origin master
 )
 
@@ -145,12 +146,12 @@ goto MAIN_MENU
 
 
 :: =====================================================================
-:: MENU 3: GIT PUSH (SIMPAN DAN KIRIM PERUBAHAN)
+:: MENU 3: GIT PUSH
 :: =====================================================================
 :GIT_PUSH
 cls
 echo =====================================================================
-echo             SIMPAN DAN KIRIM PERUBAHAN KE GITHUB (PUSH)
+echo             SIMPAN DAN KIRIM PERUBAHAN KE GITHUB - PUSH
 echo =====================================================================
 echo.
 
@@ -166,36 +167,45 @@ git status --short
 echo ---------------------------------------------------------------------
 echo.
 
-set /p COMMIT_MSG="Tulis keterangan perubahan Anda (misal: ganti teks hero): "
+set /p COMMIT_MSG="Tulis keterangan perubahan Anda: "
 if "!COMMIT_MSG!"=="" set "COMMIT_MSG=Update proyek oleh rekan tim"
 
 echo.
 echo [1/3] Menambahkan file yang diubah...
 git add .
 
-echo [2/3] Menyimpan catatan perubahan (commit)...
+echo [2/3] Menyimpan catatan perubahan...
 git commit -m "!COMMIT_MSG!"
 
 echo [3/3] Mengirim perubahan ke GitHub...
 git push origin main
-if %errorlevel% neq 0 (
-    echo.
-    echo [INFO] Mencoba push ke branch master...
-    git push origin master
-)
+if %errorlevel% equ 0 goto PUSH_SUCCESS
 
-if %errorlevel% equ 0 (
-    echo.
-    echo [SUKSES] Perubahan berhasil dikirim ke GitHub!
-) else (
-    echo.
-    echo [PERHATIAN] Gagal push ke GitHub!
-    echo Kemungkinan penyebab:
-    echo 1. Anda belum diundang sebagai 'Collaborator' di repo pemilik.
-    echo    (Minta pemilik repo invite username GitHub Anda di Settings ^> Collaborators).
-    echo 2. Ada perubahan baru dari teman lain di GitHub (Coba jalankan menu 2: Pull dulu).
-)
+echo.
+echo [INFO] Mencoba push ke branch master...
+git push origin master
+if %errorlevel% equ 0 goto PUSH_SUCCESS
+goto PUSH_FAILED
 
+:PUSH_SUCCESS
+echo.
+echo =====================================================================
+echo [SUKSES] Perubahan berhasil tersimpan dan terkirim ke GitHub!
+echo =====================================================================
+echo.
+pause
+goto MAIN_MENU
+
+:PUSH_FAILED
+echo.
+echo =====================================================================
+echo [PERHATIAN] Gagal push ke GitHub!
+echo =====================================================================
+echo Kemungkinan penyebab:
+echo 1. Anda belum diundang sebagai Collaborator di repo pemilik.
+echo    Minta pemilik repo invite username GitHub Anda di Settings - Collaborators.
+echo 2. Ada perubahan baru dari teman lain di GitHub.
+echo    Solusi: Jalankan menu nomor 2 (Pull) terlebih dahulu.
 echo.
 pause
 goto MAIN_MENU
@@ -210,67 +220,71 @@ echo =====================================================================
 echo                  UPLOAD / DEPLOY WEBSITE KE VERCEL
 echo =====================================================================
 echo.
-echo  [1] Deploy Cepat ke Production (Live Online)
-echo  [2] Deploy Preview (Untuk Uji Coba Sementara)
-echo  [3] Login Akun Vercel (Pertama kali untuk Teman)
-echo  [4] Sambungkan ke Project Vercel yang Sama (Vercel Link)
+echo  [1] Deploy Cepat ke Production - Live Online
+echo  [2] Deploy Preview - Untuk Uji Coba Sementara
+echo  [3] Login Akun Vercel - Pertama kali untuk Teman
+echo  [4] Sambungkan ke Project Vercel yang Sama - Vercel Link
 echo  [0] Kembali ke Menu Utama
 echo ---------------------------------------------------------------------
 set /p VERCEL_CHOICE="Pilih opsi Vercel [0-4]: "
 
-if "%VERCEL_CHOICE%"=="1" (
-    echo.
-    echo Menjalankan deploy ke Vercel Production...
-    call npx -y vercel --prod
-    pause
-    goto VERCEL_MENU
-)
-if "%VERCEL_CHOICE%"=="2" (
-    echo.
-    echo Menjalankan deploy ke Vercel Preview...
-    call npx -y vercel
-    pause
-    goto VERCEL_MENU
-)
-if "%VERCEL_CHOICE%"=="3" (
-    echo.
-    echo Membuka proses login Vercel di browser...
-    call npx -y vercel login
-    pause
-    goto VERCEL_MENU
-)
-if "%VERCEL_CHOICE%"=="4" (
-    echo.
-    echo Menghubungkan direktori ini ke project Vercel...
-    call npx -y vercel link
-    pause
-    goto VERCEL_MENU
-)
+if "%VERCEL_CHOICE%"=="1" goto VERCEL_PROD
+if "%VERCEL_CHOICE%"=="2" goto VERCEL_PREVIEW
+if "%VERCEL_CHOICE%"=="3" goto VERCEL_LOGIN
+if "%VERCEL_CHOICE%"=="4" goto VERCEL_LINK
 if "%VERCEL_CHOICE%"=="0" goto MAIN_MENU
 
 echo Pilihan tidak valid.
 pause
 goto VERCEL_MENU
 
+:VERCEL_PROD
+echo.
+echo Menjalankan deploy ke Vercel Production...
+call npx -y vercel --prod
+pause
+goto VERCEL_MENU
+
+:VERCEL_PREVIEW
+echo.
+echo Menjalankan deploy ke Vercel Preview...
+call npx -y vercel
+pause
+goto VERCEL_MENU
+
+:VERCEL_LOGIN
+echo.
+echo Membuka proses login Vercel di browser...
+call npx -y vercel login
+pause
+goto VERCEL_MENU
+
+:VERCEL_LINK
+echo.
+echo Menghubungkan direktori ini ke project Vercel...
+call npx -y vercel link
+pause
+goto VERCEL_MENU
+
 
 :: =====================================================================
-:: MENU 5: SETUP REMOTE GITHUB (UNTUK PEMILIK)
+:: MENU 5: SETUP REMOTE GITHUB
 :: =====================================================================
 :SETUP_REMOTE_GITHUB
 cls
 echo =====================================================================
-echo          HUBUNGKAN KE REPOSITORI GITHUB (KHUSUS PEMILIK)
+echo          HUBUNGKAN KE REPOSITORI GITHUB - KHUSUS PEMILIK
 echo =====================================================================
 echo.
 echo Langkah-langkah bagi Pemilik Repo:
 echo 1. Buka browser: https://github.com/new
-echo 2. Beri nama repo (contoh: heima-creative).
-echo 3. Pilih 'Public' atau 'Private'.
-echo 4. JANGAN centang 'Add a README file' (biarkan kosong).
-echo 5. Klik tombol 'Create repository'.
-echo 6. Salin link HTTPS repo Anda (contoh: https://github.com/akun/heima-creative.git).
+echo 2. Beri nama repo (contoh: HEIMA.CREATIVE).
+echo 3. Pilih Public atau Private.
+echo 4. JANGAN centang Add a README file (biarkan kosong).
+echo 5. Klik tombol Create repository.
+echo 6. Salin link HTTPS repo Anda (contoh: https://github.com/spc02/HEIMA.CREATIVE.git).
 echo.
-set /p INPUT_REPO_URL="Tempel (Paste) URL repo GitHub Anda di sini: "
+set /p INPUT_REPO_URL="Tempel atau Paste URL repo GitHub Anda di sini: "
 
 if "!INPUT_REPO_URL!"=="" (
     echo URL tidak boleh kosong!
@@ -278,7 +292,6 @@ if "!INPUT_REPO_URL!"=="" (
     goto MAIN_MENU
 )
 
-:: Simpan URL ke file konfigurasi agar teman otomatis membaca
 echo !INPUT_REPO_URL! > "%REPO_CONFIG_FILE%"
 
 cd /d "%~dp0"
@@ -289,24 +302,28 @@ git branch -M main
 echo.
 echo Mengirim kode awal proyek ke GitHub...
 git push -u origin main
+if %errorlevel% equ 0 goto REMOTE_SUCCESS
+goto REMOTE_FAILED
 
-if %errorlevel% equ 0 (
-    echo.
-    echo [SUKSES!] Repositori berhasil terhubung dan kode terkirim ke GitHub!
-    echo Sekarang Anda bisa mengundang teman Anda di GitHub:
-    echo Masuk ke Repo ^> Settings ^> Collaborators ^> Add people (masukkan username teman Anda).
-) else (
-    echo.
-    echo [PERINGATAN] Gagal push awal ke GitHub. Pastikan URL benar dan Anda sudah login.
-)
+:REMOTE_SUCCESS
+echo.
+echo [SUKSES] Repositori berhasil terhubung dan kode terkirim ke GitHub!
+echo Sekarang Anda bisa mengundang teman Anda di GitHub:
+echo Buka Repo - Settings - Collaborators - Add people lalu masukkan username teman Anda.
+echo.
+pause
+goto MAIN_MENU
 
+:REMOTE_FAILED
+echo.
+echo [PERINGATAN] Gagal push awal ke GitHub. Pastikan URL benar dan Anda sudah login.
 echo.
 pause
 goto MAIN_MENU
 
 
 :: =====================================================================
-:: MENU 6: CLONE / DOWNLOAD PROYEK UNTUK TEMAN BARU
+:: MENU 6: CLONE PROJECT
 :: =====================================================================
 :CLONE_PROJECT
 cls
@@ -321,7 +338,7 @@ if exist "%REPO_CONFIG_FILE%" (
 )
 
 if "!TARGET_REPO!"=="" (
-    set /p TARGET_REPO="Masukkan URL GitHub repo (contoh: https://github.com/user/repo.git): "
+    set /p TARGET_REPO="Masukkan URL GitHub repo: "
 ) else (
     echo Ditemukan URL repo tersimpan: !TARGET_REPO!
     set /p USE_SAVED="Gunakan URL ini? [Y/N]: "
@@ -337,26 +354,29 @@ if "!TARGET_REPO!"=="" (
 )
 
 echo.
-set /p CLONE_DIR="Nama folder untuk proyek (tekan ENTER untuk default 'heima-creative'): "
-if "!CLONE_DIR!"=="" set "CLONE_DIR=heima-creative"
+set /p CLONE_DIR="Nama folder untuk proyek (tekan ENTER untuk default 'HEIMA.CREATIVE'): "
+if "!CLONE_DIR!"=="" set "CLONE_DIR=HEIMA.CREATIVE"
 
 echo.
 echo Mengunduh proyek dari GitHub...
 git clone !TARGET_REPO! "!CLONE_DIR!"
+if %errorlevel% equ 0 goto CLONE_SUCCESS
+goto CLONE_FAILED
 
-if %errorlevel% equ 0 (
-    echo.
-    echo [SUKSES!] Proyek berhasil di-clone ke folder: !CLONE_DIR!
-    echo.
-    :: Salin file bat ini ke dalam folder hasil clone agar teman mudah menggunakannya
-    copy "%~f0" "!CLONE_DIR!\collab_heima.bat" >nul 2>nul
-    echo File collab_heima.bat sudah otomatis ditaruh di dalam folder '!CLONE_DIR!'.
-    echo Teman Anda tinggal masuk ke folder '!CLONE_DIR!' dan jalankan 'collab_heima.bat'.
-) else (
-    echo.
-    echo [GAGAL] Tidak dapat meng-clone repositori. Periksa kembali URL dan koneksi internet Anda.
-)
+:CLONE_SUCCESS
+echo.
+echo [SUKSES] Proyek berhasil di-clone ke folder: !CLONE_DIR!
+echo.
+copy "%~f0" "!CLONE_DIR!\collab_heima.bat" >nul 2>nul
+echo File collab_heima.bat sudah otomatis ditaruh di dalam folder '!CLONE_DIR!'.
+echo Teman Anda tinggal masuk ke folder '!CLONE_DIR!' dan jalankan collab_heima.bat.
+echo.
+pause
+goto MAIN_MENU
 
+:CLONE_FAILED
+echo.
+echo [GAGAL] Tidak dapat meng-clone repositori. Periksa kembali URL dan koneksi internet Anda.
 echo.
 pause
 goto MAIN_MENU
