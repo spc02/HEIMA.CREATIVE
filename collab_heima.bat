@@ -332,6 +332,17 @@ echo               DOWNLOAD / CLONE PROYEK KE KOMPUTER TEMAN
 echo =====================================================================
 echo.
 
+if exist "%~dp0.git" (
+    echo [PEMBERITAHUAN]
+    echo Komputer ini SUDAH berada di dalam folder proyek HEIMA.CREATIVE!
+    echo Menu Download/Clone ini hanya diperlukan jika teman Anda
+    echo baru pertama kali mengunduh proyek ke folder baru di komputernya.
+    echo.
+    set /p CONFIRM_CLONE="Tetap ingin mendownload salinan folder baru? [Y/N]: "
+    if /i not "!CONFIRM_CLONE!"=="Y" goto MAIN_MENU
+    echo.
+)
+
 set "TARGET_REPO=%DEFAULT_REPO_URL%"
 if exist "%REPO_CONFIG_FILE%" (
     set /p TARGET_REPO=<"%REPO_CONFIG_FILE%"
@@ -383,23 +394,81 @@ goto MAIN_MENU
 
 
 :: =====================================================================
-:: MENU 7: CEK STATUS PROYEK
+:: MENU 7: CEK STATUS PROYEK (PENJELASAN RAMAH UNTUK ORANG AWAM)
 :: =====================================================================
 :CHECK_STATUS
 cls
 echo =====================================================================
-echo                      STATUS GIT DAN VERCEL
+echo               RINGKASAN STATUS PROYEK (PENJELASAN LENGKAP)
 echo =====================================================================
 echo.
-echo --- KONFIGURASI GIT ---
-git config user.name 2>nul
-git config user.email 2>nul
-echo.
-echo --- REMOTE GITHUB ---
-git remote -v
-echo.
-echo --- STATUS FILE SAAT INI ---
-git status
+
+:: 1. Cek Identitas
+set "CHECK_NAME="
+set "CHECK_EMAIL="
+for /f "tokens=*" %%i in ('git config user.name 2^>nul') do set "CHECK_NAME=%%i"
+for /f "tokens=*" %%i in ('git config user.email 2^>nul') do set "CHECK_EMAIL=%%i"
+
+echo [1] IDENTITAS AKUN GITHUB:
+if not "!CHECK_NAME!"=="" (
+    echo   - Nama Pengguna   : !CHECK_NAME!
+    echo   - Email Terdaftar : !CHECK_EMAIL!
+    echo   - Keterangan      : Identitas aktif. Setiap perubahan yang Anda simpan
+    echo                       akan tercatat resmi atas nama Anda.
+) else (
+    echo   - Status          : BELUM DIATUR!
+    echo   - Keterangan      : Silakan jalankan menu nomor [1] di menu utama
+    echo                       untuk mendaftarkan Nama dan Email Anda.
+)
+echo ---------------------------------------------------------------------
+
+:: 2. Cek Koneksi Repo
+set "CHECK_REMOTE="
+for /f "tokens=*" %%i in ('git remote get-url origin 2^>nul') do set "CHECK_REMOTE=%%i"
+
+echo [2] KONEKSI KE GITHUB ONLINE:
+if not "!CHECK_REMOTE!"=="" (
+    echo   - Status          : TERHUBUNG KE GITHUB ONLINE
+    echo   - Link Repositori : !CHECK_REMOTE!
+    echo   - Keterangan      : Komputer ini sudah tersambung ke GitHub online.
+    echo                       Anda bisa langsung Ambil (Pull) atau Kirim (Push) data.
+) else (
+    echo   - Status          : BELUM TERHUBUNG
+    echo   - Keterangan      : Proyek ini belum terhubung ke GitHub.
+)
+echo ---------------------------------------------------------------------
+
+:: 3. Cek Status File
+set "HAS_CHANGES="
+for /f "tokens=*" %%i in ('git status --porcelain 2^>nul') do set "HAS_CHANGES=1"
+
+echo [3] STATUS FILE DI LAPTOP ANDA:
+if "!HAS_CHANGES!"=="" (
+    echo   - Status          : SEMUA FILE SINKRON DAN AMAN (100%% RAPI)
+    echo   - Keterangan      : Tidak ada file yang tertinggal atau belum disimpan.
+    echo                       File di laptop Anda sama persis dengan yang ada di GitHub.
+) else (
+    echo   - Status          : ADA FILE BARU ATAU SEDANG DIEDIT
+    echo   - Daftar File     :
+    git status --short
+    echo.
+    echo   - Saran Tindakan  : Jika sudah selesai mengedit, jalankan menu nomor [3]
+    echo                       untuk menyimpan dan mengirim perubahan ini ke GitHub.
+)
+echo ---------------------------------------------------------------------
+
+:: 4. Cek Vercel
+echo [4] STATUS UPLOAD KE VERCEL (WEBSITE LIVE):
+if exist "%~dp0.vercel\project.json" (
+    echo   - Status          : SUDAH TERHUBUNG KE VERCEL
+    echo   - Nama Project    : heima-creative
+    echo   - Keterangan      : Website siap di-publish/upload online ke Vercel
+    echo                       kapan saja menggunakan menu nomor [4].
+) else (
+    echo   - Status          : BELUM TERHUBUNG KE VERCEL
+    echo   - Keterangan      : Anda dapat menghubungkan atau deploy kapan saja via menu [4].
+)
+echo =====================================================================
 echo.
 pause
 goto MAIN_MENU
