@@ -54,20 +54,32 @@ if not "!INPUT_EMAIL!"=="" git config --global user.email "!INPUT_EMAIL!"
 echo.
 
 :LANJUT_SYNC
-:: 2. Jika dijalankan di luar folder proyek (teman baru), clone otomatis
-if not exist "%~dp0.git" goto PROSES_CLONE
+:: Jika file bat ini dijalankan di dalam folder proyek:
+if exist "%~dp0.git" (
+    echo Mengambil update terbaru dari GitHub...
+    echo.
+    git pull origin main
+    echo.
+    echo [SUKSES] Proyek Anda sudah yang paling baru!
+    echo.
+    pause
+    goto MENU
+)
 
-:: 3. Jika sudah di dalam proyek, cukup ambil update terbaru (pull)
-echo Mengambil update terbaru dari GitHub...
-echo.
-git pull origin main
-echo.
-echo [SUKSES] Proyek Anda sudah yang paling baru!
-echo.
-pause
-goto MENU
+:: Jika folder HEIMA.CREATIVE sudah ada di samping file bat ini:
+if exist "%~dp0HEIMA.CREATIVE\.git" (
+    echo [INFO] Folder HEIMA.CREATIVE sudah ada di komputer Anda.
+    echo Mengambil update terbaru dari GitHub ke dalam folder tersebut...
+    echo.
+    git -C "%~dp0HEIMA.CREATIVE" pull origin main
+    echo.
+    echo [SUKSES] Folder HEIMA.CREATIVE berhasil diperbarui ke versi paling baru!
+    echo.
+    pause
+    goto MENU
+)
 
-:PROSES_CLONE
+:: Jika belum ada sama sekali (teman baru):
 echo Mengunduh proyek HEIMA.CREATIVE ke komputer Anda...
 echo.
 git clone %REPO_URL% HEIMA.CREATIVE
@@ -97,8 +109,12 @@ echo             KIRIM UPDATE KE GITHUB (PUSH)
 echo =====================================================
 echo.
 
-if not exist "%~dp0.git" (
-    echo [ERROR] File bat ini belum berada di dalam folder proyek!
+set "TARGET_DIR="
+if exist "%~dp0.git" set "TARGET_DIR=%~dp0"
+if not defined TARGET_DIR if exist "%~dp0HEIMA.CREATIVE\.git" set "TARGET_DIR=%~dp0HEIMA.CREATIVE\"
+
+if not defined TARGET_DIR (
+    echo [ERROR] Tidak dapat menemukan folder proyek Git!
     pause
     goto MENU
 )
@@ -108,9 +124,9 @@ if "!PESAN!"=="" set "PESAN=Update proyek oleh tim"
 
 echo.
 echo Menyimpan dan mengirim ke GitHub...
-git add .
-git commit -m "!PESAN!"
-git push origin main
+git -C "%TARGET_DIR%" add .
+git -C "%TARGET_DIR%" commit -m "!PESAN!"
+git -C "%TARGET_DIR%" push origin main
 
 if %errorlevel% equ 0 goto KIRIM_SUKSES
 goto KIRIM_GAGAL
@@ -143,7 +159,16 @@ echo =====================================================
 echo.
 echo Memulai proses upload ke Vercel...
 echo.
-call npx -y vercel --prod
+if exist "%~dp0heima-creative.html" (
+    call npx -y vercel --prod
+) else if exist "%~dp0HEIMA.CREATIVE\heima-creative.html" (
+    cd /d "%~dp0HEIMA.CREATIVE"
+    call npx -y vercel --prod
+    cd /d "%~dp0"
+) else (
+    call npx -y vercel --prod
+)
+
 echo.
 echo Proses deploy selesai!
 echo.

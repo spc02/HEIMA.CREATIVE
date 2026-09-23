@@ -8,7 +8,7 @@ namespace HeimaCreative
     {
         const string REPO_URL = "https://github.com/spc02/HEIMA.CREATIVE.git";
 
-        static int RunProcess(string command, string args, bool wait = true)
+        static int RunProcess(string command, string args, string workingDir = "")
         {
             try
             {
@@ -19,14 +19,14 @@ namespace HeimaCreative
                     UseShellExecute = false,
                     CreateNoWindow = false
                 };
+                if (!string.IsNullOrEmpty(workingDir))
+                {
+                    psi.WorkingDirectory = workingDir;
+                }
                 using (Process proc = Process.Start(psi))
                 {
-                    if (wait)
-                    {
-                        proc.WaitForExit();
-                        return proc.ExitCode;
-                    }
-                    return 0;
+                    proc.WaitForExit();
+                    return proc.ExitCode;
                 }
             }
             catch (Exception ex)
@@ -127,16 +127,27 @@ namespace HeimaCreative
             }
 
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            if (Directory.Exists(Path.Combine(baseDir, ".git")))
+            string insideGit = Path.Combine(baseDir, ".git");
+            string subGit = Path.Combine(baseDir, "HEIMA.CREATIVE", ".git");
+
+            if (Directory.Exists(insideGit))
             {
                 Console.WriteLine("Mengambil update terbaru dari GitHub...\n");
-                RunProcess("git", "pull origin main");
+                RunProcess("git", "pull origin main", baseDir);
                 Console.WriteLine("\n[SUKSES] Proyek Anda sudah yang paling baru!\n");
+            }
+            else if (Directory.Exists(subGit))
+            {
+                string targetDir = Path.Combine(baseDir, "HEIMA.CREATIVE");
+                Console.WriteLine("[INFO] Folder HEIMA.CREATIVE sudah ada di komputer Anda.");
+                Console.WriteLine("Mengambil update terbaru ke folder tersebut...\n");
+                RunProcess("git", "pull origin main", targetDir);
+                Console.WriteLine("\n[SUKSES] Folder HEIMA.CREATIVE berhasil diperbarui ke versi paling baru!\n");
             }
             else
             {
                 Console.WriteLine("Mengunduh proyek HEIMA.CREATIVE ke komputer Anda...\n");
-                int code = RunProcess("git", "clone " + REPO_URL + " HEIMA.CREATIVE");
+                int code = RunProcess("git", "clone " + REPO_URL + " HEIMA.CREATIVE", baseDir);
                 if (code == 0)
                 {
                     try
@@ -169,22 +180,28 @@ namespace HeimaCreative
             Console.WriteLine();
 
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-            if (!Directory.Exists(Path.Combine(baseDir, ".git")))
+            string targetDir = "";
+            if (Directory.Exists(Path.Combine(baseDir, ".git")))
+                targetDir = baseDir;
+            else if (Directory.Exists(Path.Combine(baseDir, "HEIMA.CREATIVE", ".git")))
+                targetDir = Path.Combine(baseDir, "HEIMA.CREATIVE");
+
+            if (string.IsNullOrEmpty(targetDir))
             {
-                Console.WriteLine("[ERROR] Aplikasi ini belum berada di dalam folder proyek!\n");
+                Console.WriteLine("[ERROR] Tidak dapat menemukan folder proyek Git!\n");
                 Console.WriteLine("Tekan ENTER untuk kembali ke menu...");
                 Console.ReadLine();
                 return;
             }
 
-            Console.Write("Tulis keterangan perubahan Anda (tekan Enter untuk default): ");
+            Console.Write("Tulis keterangan apa yang Anda ubah (tekan Enter untuk langsung kirim): ");
             string pesan = Console.ReadLine();
             if (string.IsNullOrEmpty(pesan)) pesan = "Update proyek oleh tim";
 
             Console.WriteLine("\nMenyimpan dan mengirim ke GitHub...");
-            RunProcess("git", "add .");
-            RunProcess("git", "commit -m \"" + pesan + "\"");
-            int pushCode = RunProcess("git", "push origin main");
+            RunProcess("git", "add .", targetDir);
+            RunProcess("git", "commit -m \"" + pesan + "\"", targetDir);
+            int pushCode = RunProcess("git", "push origin main", targetDir);
 
             if (pushCode == 0)
             {
@@ -208,9 +225,14 @@ namespace HeimaCreative
             Console.WriteLine("             UPLOAD WEBSITE KE VERCEL                ");
             Console.WriteLine("=====================================================");
             Console.WriteLine();
-            Console.WriteLine("Memulai proses upload ke Vercel...\n");
 
-            RunProcess("cmd.exe", "/c npx -y vercel --prod");
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string deployDir = baseDir;
+            if (File.Exists(Path.Combine(baseDir, "HEIMA.CREATIVE", "heima-creative.html")))
+                deployDir = Path.Combine(baseDir, "HEIMA.CREATIVE");
+
+            Console.WriteLine("Memulai proses upload ke Vercel...\n");
+            RunProcess("cmd.exe", "/c npx -y vercel --prod", deployDir);
 
             Console.WriteLine("\nProses deploy selesai!\n");
             Console.WriteLine("Tekan ENTER untuk kembali ke menu...");
