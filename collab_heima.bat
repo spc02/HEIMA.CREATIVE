@@ -410,16 +410,19 @@ for /f "tokens=*" %%i in ('git config user.name 2^>nul') do set "CHECK_NAME=%%i"
 for /f "tokens=*" %%i in ('git config user.email 2^>nul') do set "CHECK_EMAIL=%%i"
 
 echo [1] IDENTITAS AKUN GITHUB:
-if not "!CHECK_NAME!"=="" (
-    echo   - Nama Pengguna   : !CHECK_NAME!
-    echo   - Email Terdaftar : !CHECK_EMAIL!
-    echo   - Keterangan      : Identitas aktif. Setiap perubahan yang Anda simpan
-    echo                       akan tercatat resmi atas nama Anda.
-) else (
-    echo   - Status          : BELUM DIATUR!
-    echo   - Keterangan      : Silakan jalankan menu nomor [1] di menu utama
-    echo                       untuk mendaftarkan Nama dan Email Anda.
-)
+if "!CHECK_NAME!"=="" goto STATUS_NAME_EMPTY
+echo   - Nama Pengguna   : !CHECK_NAME!
+echo   - Email Terdaftar : !CHECK_EMAIL!
+echo   - Keterangan      : Identitas aktif. Setiap perubahan yang Anda simpan
+echo                       akan tercatat resmi atas nama Anda.
+goto STATUS_CHECK_REMOTE
+
+:STATUS_NAME_EMPTY
+echo   - Status          : BELUM DIATUR!
+echo   - Keterangan      : Silakan jalankan menu nomor 1 di menu utama
+echo                       untuk mendaftarkan Nama dan Email Anda.
+
+:STATUS_CHECK_REMOTE
 echo ---------------------------------------------------------------------
 
 :: 2. Cek Koneksi Repo
@@ -427,15 +430,18 @@ set "CHECK_REMOTE="
 for /f "tokens=*" %%i in ('git remote get-url origin 2^>nul') do set "CHECK_REMOTE=%%i"
 
 echo [2] KONEKSI KE GITHUB ONLINE:
-if not "!CHECK_REMOTE!"=="" (
-    echo   - Status          : TERHUBUNG KE GITHUB ONLINE
-    echo   - Link Repositori : !CHECK_REMOTE!
-    echo   - Keterangan      : Komputer ini sudah tersambung ke GitHub online.
-    echo                       Anda bisa langsung Ambil (Pull) atau Kirim (Push) data.
-) else (
-    echo   - Status          : BELUM TERHUBUNG
-    echo   - Keterangan      : Proyek ini belum terhubung ke GitHub.
-)
+if "!CHECK_REMOTE!"=="" goto STATUS_REMOTE_EMPTY
+echo   - Status          : TERHUBUNG KE GITHUB ONLINE
+echo   - Link Repositori : !CHECK_REMOTE!
+echo   - Keterangan      : Komputer ini sudah tersambung ke GitHub online.
+echo                       Anda bisa langsung Ambil update atau Kirim update.
+goto STATUS_CHECK_FILES
+
+:STATUS_REMOTE_EMPTY
+echo   - Status          : BELUM TERHUBUNG
+echo   - Keterangan      : Proyek ini belum terhubung ke GitHub.
+
+:STATUS_CHECK_FILES
 echo ---------------------------------------------------------------------
 
 :: 3. Cek Status File
@@ -443,31 +449,37 @@ set "HAS_CHANGES="
 for /f "tokens=*" %%i in ('git status --porcelain 2^>nul') do set "HAS_CHANGES=1"
 
 echo [3] STATUS FILE DI LAPTOP ANDA:
-if "!HAS_CHANGES!"=="" (
-    echo   - Status          : SEMUA FILE SINKRON DAN AMAN (100%% RAPI)
-    echo   - Keterangan      : Tidak ada file yang tertinggal atau belum disimpan.
-    echo                       File di laptop Anda sama persis dengan yang ada di GitHub.
-) else (
-    echo   - Status          : ADA FILE BARU ATAU SEDANG DIEDIT
-    echo   - Daftar File     :
-    git status --short
-    echo.
-    echo   - Saran Tindakan  : Jika sudah selesai mengedit, jalankan menu nomor [3]
-    echo                       untuk menyimpan dan mengirim perubahan ini ke GitHub.
-)
+if not "!HAS_CHANGES!"=="" goto STATUS_FILES_CHANGED
+echo   - Status          : SEMUA FILE SINKRON DAN AMAN (100 persen RAPI)
+echo   - Keterangan      : Tidak ada file yang tertinggal atau belum disimpan.
+echo                       File di laptop Anda sama persis dengan yang ada di GitHub.
+goto STATUS_CHECK_VERCEL
+
+:STATUS_FILES_CHANGED
+echo   - Status          : ADA FILE BARU ATAU SEDANG DIEDIT
+echo   - Daftar File     :
+git status --short
+echo.
+echo   - Saran Tindakan  : Jika sudah selesai mengedit, jalankan menu nomor 3
+echo                       untuk menyimpan dan mengirim perubahan ini ke GitHub.
+
+:STATUS_CHECK_VERCEL
 echo ---------------------------------------------------------------------
 
 :: 4. Cek Vercel
-echo [4] STATUS UPLOAD KE VERCEL (WEBSITE LIVE):
-if exist "%~dp0.vercel\project.json" (
-    echo   - Status          : SUDAH TERHUBUNG KE VERCEL
-    echo   - Nama Project    : heima-creative
-    echo   - Keterangan      : Website siap di-publish/upload online ke Vercel
-    echo                       kapan saja menggunakan menu nomor [4].
-) else (
-    echo   - Status          : BELUM TERHUBUNG KE VERCEL
-    echo   - Keterangan      : Anda dapat menghubungkan atau deploy kapan saja via menu [4].
-)
+echo [4] STATUS UPLOAD KE VERCEL:
+if not exist "%~dp0.vercel\project.json" goto STATUS_VERCEL_EMPTY
+echo   - Status          : SUDAH TERHUBUNG KE VERCEL
+echo   - Nama Project    : heima-creative
+echo   - Keterangan      : Website siap dipublikasikan ke internet
+echo                       kapan saja menggunakan menu nomor 4.
+goto STATUS_FINISH
+
+:STATUS_VERCEL_EMPTY
+echo   - Status          : BELUM TERHUBUNG KE VERCEL
+echo   - Keterangan      : Anda dapat menghubungkan atau deploy kapan saja via menu 4.
+
+:STATUS_FINISH
 echo =====================================================================
 echo.
 pause
